@@ -1,20 +1,47 @@
-import nacl.utils
 
-# echo-server.py
 
-import socket
 
-HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
-PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
-
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((HOST, PORT))
-    s.listen()
+    #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+#      server.py
+#
+#      Copyright 2014 Recursos Python - www.recursospython.com
+#
+#
+from socket import socket, error
+def main():
+    s = socket()
+    
+    # Escuchar peticiones en el puerto 6030.
+    s.bind(("localhost", 6030))
+    s.listen(0)
+    
     conn, addr = s.accept()
-    with conn:
-        print(f"Connected by {addr}")
-        while True:
-            data = conn.recv(1024)
-            if not data:
-                break
-            conn.sendall(nacl.utils.random(32))
+    f = open("switchcase-recibido.jpeg", "wb")
+    
+    while True:
+        try:
+            # Recibir datos del cliente.
+            input_data = conn.recv(1024)
+        except error:
+            print("Error de lectura.")
+            break
+        else:
+            if input_data:
+                # Compatibilidad con Python 3.
+                if isinstance(input_data, bytes):
+                    end = input_data[0] == 1
+                else:
+                    end = input_data == chr(1)
+                if not end:
+                    # Almacenar datos.
+                    f.write(input_data)
+                else:
+                    break
+    
+    print("El archivo se ha recibido correctamente.")
+    f.close()
+
+if __name__ == "__main__":
+    main()

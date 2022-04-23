@@ -1,13 +1,38 @@
-# echo-client.py
-
-import socket
-
-HOST = "127.0.0.1"  # The server's hostname or IP address
-PORT = 65432  # The port used by the server
-
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.connect((HOST, PORT))
-    s.sendall(b"Hello, world")
-    data = s.recv(1024)
-
-print(f"Received {data!r}")
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+#      client.py
+#
+#      Copyright 2014 Recursos Python - www.recursospython.com
+#
+#
+from socket import socket
+def main():
+    s = socket()
+    s.connect(("localhost", 6030))
+    
+    while True:
+        f = open("switchcase.jpeg", "rb")
+        content = f.read(1024)
+        
+        while content:
+            # Enviar contenido.
+            s.send(content)
+            content = f.read(1024)
+        
+        break
+    
+    # Se utiliza el caracter de código 1 para indicar
+    # al cliente que ya se ha enviado todo el contenido.
+    try:
+        s.send(chr(1))
+    except TypeError:
+        # Compatibilidad con Python 3.
+        s.send(bytes(chr(1), "utf-8"))
+    
+    # Cerrar conexión y archivo.
+    s.close()
+    f.close()
+    print("El archivo ha sido enviado correctamente.")
+if __name__ == "__main__":
+    main()
